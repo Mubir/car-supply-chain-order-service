@@ -24,9 +24,7 @@ public class CarOrderDto extends BaseItem{
 
     private UUID customerId;
     private String customerRef;
-
     private List<CarOrderLineDto> carOrderLines;
-
     private OrderStatusEnum orderStatus;
     private String orderStatusCallbackUrl;
 }
