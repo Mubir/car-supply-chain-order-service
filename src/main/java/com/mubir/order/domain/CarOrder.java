@@ -1,10 +1,8 @@
 package com.mubir.order.domain;
 
 
-<<<<<<< HEAD
 import lombok.Builder;
-=======
->>>>>>> c1f9aea2bbf8801c1a887fee4562ab39bc8cbead
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,7 +39,7 @@ public class CarOrder extends BaseEntity {
 
     @ManyToOne
     private Customer customer;
-    
+
     @OneToMany(mappedBy = "carOrder", cascade = CascadeType.ALL)
 
     @Fetch(FetchMode.JOIN)
