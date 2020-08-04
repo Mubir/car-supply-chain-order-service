@@ -1,7 +1,10 @@
 package com.mubir.order.domain;
 
 
+<<<<<<< HEAD
 import lombok.Builder;
+=======
+>>>>>>> c1f9aea2bbf8801c1a887fee4562ab39bc8cbead
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +24,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 public class CarOrder extends BaseEntity {
+
     @Builder
     public CarOrder(UUID id, Long version, Timestamp createdDate, Timestamp lastModifiedDate, String customerRef,
                     Customer customer, Set<CarOrderLine> carOrderLines, OrderStatusEnum orderStatus,
@@ -37,8 +41,9 @@ public class CarOrder extends BaseEntity {
 
     @ManyToOne
     private Customer customer;
-
+    
     @OneToMany(mappedBy = "carOrder", cascade = CascadeType.ALL)
+
     @Fetch(FetchMode.JOIN)
     private Set<CarOrderLine> carOrderLines;
 
