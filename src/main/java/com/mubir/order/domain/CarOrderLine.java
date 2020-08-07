@@ -17,10 +17,11 @@ import java.util.UUID;
 public class CarOrderLine extends BaseEntity {
     @Builder
     public CarOrderLine(UUID id, Long version, Timestamp createdDate, Timestamp lastModifiedDate,
-                        CarOrder carOrder, UUID carId, Integer orderQuantity, Integer quantityAllocated) {
+                        CarOrder carOrder, UUID carId,String upc, Integer orderQuantity, Integer quantityAllocated) {
         super(id, version, createdDate, lastModifiedDate);
         this.carOrder = carOrder;
         this.carId = carId;
+        this.upc = upc;
         this.orderQuantity = orderQuantity;
         this.quantityAllocated = quantityAllocated;
     }
@@ -28,6 +29,7 @@ public class CarOrderLine extends BaseEntity {
     @ManyToOne
     private CarOrder carOrder;
     private UUID carId;
+    private String upc;
     private Integer orderQuantity = 0;
     private Integer quantityAllocated = 0;
 
