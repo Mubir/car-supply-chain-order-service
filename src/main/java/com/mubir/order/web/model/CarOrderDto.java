@@ -13,7 +13,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class CarOrderDto extends BaseItem{
     @Builder
-    public CarOrderDto(UUID id, Integer version, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate, UUID customerId, String customerRef, List<CarOrderLineDto> carOrderLines, OrderStatusEnum orderStatus, String orderStatusCallbackUrl) {
+    public CarOrderDto(UUID id, Integer version, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate, UUID customerId, String customerRef, List<CarOrderLineDto> carOrderLines, String orderStatus, String orderStatusCallbackUrl) {
         super(id, version, createdDate, lastModifiedDate);
         this.customerId = customerId;
         this.customerRef = customerRef;
@@ -25,6 +25,6 @@ public class CarOrderDto extends BaseItem{
     private UUID customerId;
     private String customerRef;
     private List<CarOrderLineDto> carOrderLines;
-    private OrderStatusEnum orderStatus;
+    private String orderStatus;
     private String orderStatusCallbackUrl;
 }

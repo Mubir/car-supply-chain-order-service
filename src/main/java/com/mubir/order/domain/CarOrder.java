@@ -25,13 +25,13 @@ public class CarOrder extends BaseEntity {
 
     @Builder
     public CarOrder(UUID id, Long version, Timestamp createdDate, Timestamp lastModifiedDate, String customerRef,
-                    Customer customer, Set<CarOrderLine> carOrderLines, OrderStatusEnum orderStatus,
+                    Customer customer, Set<CarOrderLine> carOrderLines, CarOrderStatusEnum carOrderStatus,
                     String orderStatusCallbackUrl) {
         super(id, version, createdDate, lastModifiedDate);
         this.customerRef = customerRef;
         this.customer = customer;
         this.carOrderLines = carOrderLines;
-        this.orderStatus = orderStatus;
+        this.orderStatus = carOrderStatus;
         this.orderStatusCallbackUrl = orderStatusCallbackUrl;
     }
 
@@ -45,7 +45,7 @@ public class CarOrder extends BaseEntity {
     @Fetch(FetchMode.JOIN)
     private Set<CarOrderLine> carOrderLines;
 
-    private OrderStatusEnum orderStatus = OrderStatusEnum.NEW;
+    private CarOrderStatusEnum orderStatus =CarOrderStatusEnum.NEW;
     private String orderStatusCallbackUrl;
 
 }

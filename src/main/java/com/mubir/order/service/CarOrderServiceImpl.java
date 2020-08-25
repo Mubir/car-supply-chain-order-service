@@ -1,8 +1,8 @@
 package com.mubir.order.service;
 
 import com.mubir.order.domain.CarOrder;
+import com.mubir.order.domain.CarOrderStatusEnum;
 import com.mubir.order.domain.Customer;
-import com.mubir.order.domain.OrderStatusEnum;
 import com.mubir.order.repositories.CarOrderRepository;
 import com.mubir.order.repositories.CustomerRepository;
 import com.mubir.order.web.mapper.CarOrderMapper;
@@ -59,7 +59,7 @@ public class CarOrderServiceImpl implements CarOrderService {
             CarOrder carOrder = carOrderMapper.dtoToCarOrder(carOrderDto);
             carOrder.setId(null); // should not be set by outside client
             carOrder.setCustomer(customerOptional.get());
-            carOrder.setOrderStatus(OrderStatusEnum.NEW);
+            carOrder.setOrderStatus(CarOrderStatusEnum.NEW);
 
             carOrder.getCarOrderLines().forEach(line -> line.setCarOrder(carOrder));
 
@@ -78,7 +78,7 @@ public class CarOrderServiceImpl implements CarOrderService {
     @Override
     public void pickupOrder(UUID customerId, UUID orderId) {
         CarOrder carOrder = getOrder(customerId, orderId);
-        carOrder.setOrderStatus(OrderStatusEnum.PICK_UP);
+        carOrder.setOrderStatus(CarOrderStatusEnum.PICKED_UP);
         carOrderRepository.save(carOrder);
     }
 
