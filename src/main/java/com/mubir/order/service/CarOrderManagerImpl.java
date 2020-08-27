@@ -14,6 +14,8 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class CarOrderManagerImpl implements CarOrderManager{
@@ -30,6 +32,19 @@ public class CarOrderManagerImpl implements CarOrderManager{
         CarOrder savedCarOrder = carOrderRepository.save(carOrder);
         sendCarOrderEvent(savedCarOrder,CarOrderEventEnum.VALIDATE_ORDER);
         return savedCarOrder;
+    }
+
+    @Override
+    public void processValidationResult(UUID carOrderId, Boolean isValid) {
+        CarOrder carOrder = carOrderRepository.getOne(carOrderId);
+
+        if(isValid)
+        {
+            sendCarOrderEvent(carOrder,CarOrderEventEnum.VALIDATION_PASSED);
+        }else
+        {
+            sendCarOrderEvent(carOrder,CarOrderEventEnum.VALIDATION_FAILED);
+        }
     }
 
     private void sendCarOrderEvent(CarOrder carOrder,CarOrderEventEnum eventEnum){
