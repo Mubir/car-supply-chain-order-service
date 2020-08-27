@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
 import java.util.EnumSet;
 
@@ -24,5 +25,18 @@ public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<Ca
                 .end(CarOrderStatusEnum.DELIVERY_EXCEPTION)
                 .end(CarOrderStatusEnum.VALIDATION_EXCEPTION)
                 .end(CarOrderStatusEnum.ALLOCATION_EXCEPTION);
+    }
+
+    @Override
+    public void configure(StateMachineTransitionConfigurer<CarOrderStatusEnum, CarOrderEventEnum> transitions) throws Exception {
+        transitions.withExternal()
+                .source(CarOrderStatusEnum.NEW).target(CarOrderStatusEnum.VALIDATION_PENDING)
+                .event(CarOrderEventEnum.VALIDATE_ORDER)
+                .and().withExternal()
+                .source(CarOrderStatusEnum.NEW).target(CarOrderStatusEnum.VALIDATED)
+                .event(CarOrderEventEnum.VALIDATION_PASSED)
+                .and().withExternal()
+                .source(CarOrderStatusEnum.NEW).target(CarOrderStatusEnum.VALIDATION_EXCEPTION)
+                .event(CarOrderEventEnum.VALIDATION_FAILED);
     }
 }

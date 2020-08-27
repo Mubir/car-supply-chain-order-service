@@ -4,6 +4,7 @@ import com.mubir.order.domain.CarOrder;
 import com.mubir.order.domain.CarOrderEventEnum;
 import com.mubir.order.domain.CarOrderStatusEnum;
 import com.mubir.order.repositories.CarOrderRepository;
+import com.mubir.order.statemachine.CarOrderStateChangeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -16,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CarOrderManagerImpl implements CarOrderManager{
+    public static final String ORDER_ID_HEADER = "ORDER_ID_HEADER";
     private final StateMachineFactory<CarOrderStatusEnum, CarOrderEventEnum> stateMachineFactory;
     private final CarOrderRepository carOrderRepository;
+    private final CarOrderStateChangeInterceptor carOrderStateChangeInterceptor;
 
     @Transactional
     @Override
@@ -31,7 +34,8 @@ public class CarOrderManagerImpl implements CarOrderManager{
 
     private void sendCarOrderEvent(CarOrder carOrder,CarOrderEventEnum eventEnum){
         StateMachine<CarOrderStatusEnum,CarOrderEventEnum>  sm = build(carOrder);
-        Message msg = MessageBuilder.withPayload(eventEnum).build();
+        Message msg = MessageBuilder.withPayload(eventEnum)
+                .setHeader(ORDER_ID_HEADER,carOrder.getId().toString()).build();
         sm.sendEvent(msg);
     }
 
@@ -41,6 +45,8 @@ public class CarOrderManagerImpl implements CarOrderManager{
         sm.stop();
         sm.getStateMachineAccessor().doWithAllRegions(
                 sma->{
+
+                    sma.addStateMachineInterceptor(carOrderStateChangeInterceptor);
                     sma.resetStateMachine(new DefaultStateMachineContext<>(carOrder.getOrderStatus(),null,null,null));
                 }
         );
