@@ -41,6 +41,8 @@ public class CarOrderManagerImpl implements CarOrderManager{
         if(isValid)
         {
             sendCarOrderEvent(carOrder,CarOrderEventEnum.VALIDATION_PASSED);
+            CarOrder validatedOrder = carOrderRepository.findOneById(carOrderId);
+            sendCarOrderEvent(validatedOrder,CarOrderEventEnum.ALLOCATE_ORDER);
         }else
         {
             sendCarOrderEvent(carOrder,CarOrderEventEnum.VALIDATION_FAILED);
