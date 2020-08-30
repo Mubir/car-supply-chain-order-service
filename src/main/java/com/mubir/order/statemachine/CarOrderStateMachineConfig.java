@@ -45,6 +45,15 @@ public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<Ca
                 .and().withExternal()
                 .source(CarOrderStatusEnum.VALIDATED).target(CarOrderStatusEnum.ALLOCATION_PENDING)
                 .event(CarOrderEventEnum.ALLOCATE_ORDER)
-                .action(allocateOrderAction);
+                .action(allocateOrderAction)
+                .and().withExternal()
+                .source(CarOrderStatusEnum.ALLOCATION_PENDING).target(CarOrderStatusEnum.ALLOCATED)
+                .event(CarOrderEventEnum.ALLOCATION_SUCCESS)
+                .and().withExternal()
+                .source(CarOrderStatusEnum.ALLOCATION_PENDING).target(CarOrderStatusEnum.ALLOCATION_EXCEPTION)
+                .event(CarOrderEventEnum.ALLOCATION_FAILED)
+                .and().withExternal()
+                .source(CarOrderStatusEnum.ALLOCATION_PENDING).target(CarOrderStatusEnum.PENDING_INVENTORY)
+                .event(CarOrderEventEnum.ALLOCATION_ON_INVENTORY);
     }
 }

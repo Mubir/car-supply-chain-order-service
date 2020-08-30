@@ -5,6 +5,7 @@ import com.mubir.order.domain.CarOrderEventEnum;
 import com.mubir.order.domain.CarOrderStatusEnum;
 import com.mubir.order.repositories.CarOrderRepository;
 import com.mubir.order.statemachine.CarOrderStateChangeInterceptor;
+import com.mubir.order.web.model.CarOrderDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -47,6 +48,38 @@ public class CarOrderManagerImpl implements CarOrderManager{
         {
             sendCarOrderEvent(carOrder,CarOrderEventEnum.VALIDATION_FAILED);
         }
+    }
+
+    @Override
+    public void carOrderAllocationPassed(CarOrderDto carOrderDto) {
+        CarOrder carOrder = carOrderRepository.getOne(carOrderDto.getId());
+        sendCarOrderEvent(carOrder,CarOrderEventEnum.ALLOCATION_SUCCESS);
+        updateAllocatedQuantity(carOrderDto,carOrder);
+    }
+    private void updateAllocatedQuantity(CarOrderDto carOrderDto,CarOrder carOrder)
+    {
+        CarOrder allocatedOrder = carOrderRepository.getOne(carOrderDto.getId());
+
+        allocatedOrder.getCarOrderLines().forEach( carOrderLine -> {
+            carOrderDto.getCarOrderLines().forEach(carOrderLineDto -> {
+                if(carOrderLine.getId().equals(carOrderLineDto.getId()))
+                {
+                    carOrderLine.setQuantityAllocated(carOrderLineDto.getQuantityAllocated());
+                }
+            });
+        });
+    }
+    @Override
+    public void carOrderAllocationPendingInventory(CarOrderDto carOrderDto) {
+        CarOrder carOrder = carOrderRepository.getOne(carOrderDto.getId());
+        sendCarOrderEvent(carOrder,CarOrderEventEnum.ALLOCATION_ON_INVENTORY);
+        updateAllocatedQuantity(carOrderDto,carOrder);
+    }
+
+    @Override
+    public void carOrderAllocationFailed(CarOrderDto carOrderDto) {
+        CarOrder carOrder = carOrderRepository.getOne(carOrderDto.getId());
+        sendCarOrderEvent(carOrder,CarOrderEventEnum.ALLOCATION_FAILED);
     }
 
     private void sendCarOrderEvent(CarOrder carOrder,CarOrderEventEnum eventEnum){
