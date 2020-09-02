@@ -17,6 +17,6 @@ public interface CarOrderRepository  extends JpaRepository<CarOrder, UUID> {
 
     List<CarOrder> findAllByOrderStatus(CarOrderStatusEnum carOrderStatusEnum);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    CarOrder findOneById(UUID id);
+    //@Lock(LockModeType.PESSIMISTIC_WRITE)
+   // CarOrder findOneById(UUID id);
 }

@@ -12,8 +12,8 @@ import java.util.UUID;
 @Service
 public class CarServiceImpl implements CarService{
 
-    private  final String CAR_PATH_V1= "/api/v1/car/";
-    private  final String CAR_UPC_PATH_V1= "/api/v1/carUpc/";
+    private  final static String CAR_PATH_V1= "/api/v1/car/";
+    private  final static String CAR_UPC_PATH_V1= "/api/v1/carUpc/";
     private final RestTemplate restTemplate;
     private String carServiceHost;
 
