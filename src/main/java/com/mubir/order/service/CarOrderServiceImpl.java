@@ -8,6 +8,7 @@ import com.mubir.order.repositories.CustomerRepository;
 import com.mubir.order.web.mapper.CarOrderMapper;
 import com.mubir.order.web.model.CarOrderDto;
 import com.mubir.order.web.model.CarOrderPagedList;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -22,12 +23,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CarOrderServiceImpl implements CarOrderService {
     private final CarOrderRepository carOrderRepository;
     private final CustomerRepository customerRepository;
     private final CarOrderMapper carOrderMapper;
-    private final ApplicationEventPublisher publisher;
-
+   // private final ApplicationEventPublisher publisher;
+    private final CarOrderManager carOrderManager;
+    /*
     public CarOrderServiceImpl(CarOrderRepository carOrderRepository,
                                CustomerRepository customerRepository,
                                CarOrderMapper carOrderMapper,
@@ -37,6 +40,8 @@ public class CarOrderServiceImpl implements CarOrderService {
         this.carOrderMapper = carOrderMapper;
         this.publisher = publisher;
     }
+
+     */
 
     @Override
     public CarOrderPagedList listOrder(UUID customerId, Pageable pageable) {
@@ -63,7 +68,8 @@ public class CarOrderServiceImpl implements CarOrderService {
 
             carOrder.getCarOrderLines().forEach(line -> line.setCarOrder(carOrder));
 
-            CarOrder saveCarOrder = carOrderRepository.saveAndFlush(carOrder);
+            //CarOrder saveCarOrder = carOrderRepository.saveAndFlush(carOrder);
+            CarOrder saveCarOrder = carOrderManager.newCarOrder(carOrder);
             log.warn("Car saved" + carOrder.getId());
             return carOrderMapper.carOrderToDto(saveCarOrder);
         }
@@ -77,9 +83,12 @@ public class CarOrderServiceImpl implements CarOrderService {
 
     @Override
     public void pickupOrder(UUID customerId, UUID orderId) {
-        CarOrder carOrder = getOrder(customerId, orderId);
+        /*CarOrder carOrder = getOrder(customerId, orderId);
         carOrder.setOrderStatus(CarOrderStatusEnum.PICKED_UP);
         carOrderRepository.save(carOrder);
+
+         */
+        carOrderManager.carOrderPickUp(orderId);
     }
 
     private CarOrder getOrder(UUID customerId, UUID orderId) {
