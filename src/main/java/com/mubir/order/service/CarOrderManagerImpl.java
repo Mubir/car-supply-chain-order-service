@@ -143,6 +143,14 @@ public class CarOrderManagerImpl implements CarOrderManager{
         }, () -> log.error("Order Not Found. Id: " + carOrderDto.getId()) );
     }
 
+    @Override
+    public void carOrderPickUp(UUID id) {
+        Optional<CarOrder> carOrderOptional = carOrderRepository.findById(id);
+        carOrderOptional.ifPresentOrElse(carOrder -> {
+            sendCarOrderEvent(carOrder,CarOrderEventEnum.CARORDER_PICKED_UP);
+        },()-> log.error("order not found "+id));
+    }
+
     private void sendCarOrderEvent(CarOrder carOrder,CarOrderEventEnum eventEnum){
         StateMachine<CarOrderStatusEnum,CarOrderEventEnum>  sm = build(carOrder);
         Message msg = MessageBuilder.withPayload(eventEnum)

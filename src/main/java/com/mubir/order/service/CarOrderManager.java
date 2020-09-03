@@ -11,4 +11,5 @@ public interface CarOrderManager {
     void carOrderAllocationPassed(CarOrderDto carOrderDto);
     void carOrderAllocationPendingInventory(CarOrderDto carOrderDto);
     void carOrderAllocationFailed(CarOrderDto carOrderDto);
+    void carOrderPickUp(UUID id);
 }

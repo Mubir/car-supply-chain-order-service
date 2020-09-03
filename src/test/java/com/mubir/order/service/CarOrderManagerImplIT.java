@@ -126,7 +126,7 @@ class CarOrderManagerImplIT {
             assertEquals(CarOrderStatusEnum.ALLOCATED,foundOrder.getOrderStatus());
         });
 
-        carOrderManager.carOrderPickedUp(saveCarOrder.getId());
+        carOrderManager.carOrderPickUp(saveCarOrder.getId());
         await().untilAsserted(() ->{
             CarOrder foundOrder = carOrderRepository.findById(carOrder.getId()).get();
 
