@@ -171,7 +171,7 @@ class CarOrderManagerImplIT {
                 .willReturn(okJson(objectMapper.writeValueAsString(carDto))));
 
         CarOrder carOrder = createCarOrder();
-
+        carOrder.setCustomerRef("partial-allocation");
         CarOrder saveCarOrder = carOrderManager.newCarOrder(carOrder);
 
         await().untilAsserted(() ->{
