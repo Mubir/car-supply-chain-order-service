@@ -81,10 +81,11 @@ public class CarOrderManagerImpl implements CarOrderManager{
 
         beerOrderOptional.ifPresentOrElse(carOrder -> {
             sendCarOrderEvent(carOrder, CarOrderEventEnum.ALLOCATION_SUCCESS);
-            updateAllocatedQuantity(carOrderDto, carOrder);
+            updateAllocatedQuantity(carOrderDto);
         }, () -> log.error("Order Id Not Found: " + carOrderDto.getId() ));
     }
-    private void updateAllocatedQuantity(CarOrderDto carOrderDto,CarOrder carOrder)
+    //private void updateAllocatedQuantity(CarOrderDto carOrderDto,CarOrder carOrder)
+    private void updateAllocatedQuantity(CarOrderDto carOrderDto)
     {
         /*
         CarOrder allocatedOrder = carOrderRepository.getOne(carOrderDto.getId());
@@ -110,7 +111,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
                 });
             });
 
-            carOrderRepository.saveAndFlush(carOrder);
+            carOrderRepository.saveAndFlush(allocatedOrder);
         }, () -> log.error("Order Not Found. Id: " + carOrderDto.getId()));
     }
     @Override
@@ -124,7 +125,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
         beerOrderOptional.ifPresentOrElse(beerOrder -> {
             sendCarOrderEvent(beerOrder, CarOrderEventEnum.ALLOCATION_ON_INVENTORY);
 
-            updateAllocatedQuantity(carOrderDto, beerOrder);
+            updateAllocatedQuantity(carOrderDto);
         }, () -> log.error("Order Id Not Found: " + carOrderDto.getId() ));
     }
 
