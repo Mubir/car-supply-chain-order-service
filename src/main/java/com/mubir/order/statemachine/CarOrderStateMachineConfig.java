@@ -19,6 +19,7 @@ public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<Ca
     private final Action<CarOrderStatusEnum,CarOrderEventEnum> allocateOrderAction;
     private final Action<CarOrderStatusEnum,CarOrderEventEnum> validationFailureAction;
     private final Action<CarOrderStatusEnum,CarOrderEventEnum> allocationFailureAction;
+    private final Action<CarOrderStatusEnum,CarOrderEventEnum>  deallocateOrderAction;
     @Override
     public void configure(StateMachineStateConfigurer<CarOrderStatusEnum, CarOrderEventEnum>
                                       states) throws Exception {
@@ -69,6 +70,7 @@ public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<Ca
                 .and().withExternal()
                 .source(CarOrderStatusEnum.ALLOCATED).target(CarOrderStatusEnum.CANCELLED)
                 .event(CarOrderEventEnum.CANCEL_ORDER)
+                .action(deallocateOrderAction)
                 .and().withExternal()
                 .source(CarOrderStatusEnum.ALLOCATION_PENDING).target(CarOrderStatusEnum.PENDING_INVENTORY)
                 .event(CarOrderEventEnum.ALLOCATION_ON_INVENTORY)
