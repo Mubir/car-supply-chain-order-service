@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 
+import com.mubir.common.events.AllocationFailureEvent;
 import com.mubir.order.config.JmsConfig;
 import com.mubir.order.domain.CarOrder;
 import com.mubir.order.domain.CarOrderLine;
@@ -22,8 +23,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.annotation.Transactional;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static com.github.jenspiegsa.wiremockextension.ManagedWireMockServer.with;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
@@ -50,6 +52,8 @@ class CarOrderManagerImplIT {
     @Autowired
     WireMockServer wireMockServer;
 
+    @Autowired
+    JmsTemplate jmsTemplate;
     Customer testCostomer;
 
     UUID carId = UUID.randomUUID();
@@ -160,7 +164,7 @@ class CarOrderManagerImplIT {
         AllocationFailureEvent allocationFailureEvent = (AllocationFailureEvent)jmsTemplate.receiveAndConvert(JmsConfig.ALLOCATE_FAILURE_QUEUE);
 
         assertNotNull(allocationFailureEvent);
-        assertThat(allocationFailureEvent.getOrder()).isEqualTo(saveCarOrder.getId());
+        assertThat(allocationFailureEvent.getOrderId()).isEqualTo(saveCarOrder.getId());
     }
 
     @Test
