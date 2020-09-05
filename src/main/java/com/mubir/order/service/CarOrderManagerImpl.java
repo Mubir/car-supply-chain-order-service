@@ -16,6 +16,7 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 @Slf4j
@@ -26,6 +27,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
     private final StateMachineFactory<CarOrderStatusEnum, CarOrderEventEnum> stateMachineFactory;
     private final CarOrderRepository carOrderRepository;
     private final CarOrderStateChangeInterceptor carOrderStateChangeInterceptor;
+    private final EntityManager entityManager;
 
     @Transactional
     @Override
@@ -43,6 +45,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
     public void processValidationResult(UUID carOrderId, Boolean isValid) {
        // CarOrder carOrder = carOrderRepository.getOne(carOrderId);
         log.debug(" validation id :"+carOrderId+" status: "+isValid);
+        entityManager.flush();
         Optional<CarOrder> carOrderOptional = carOrderRepository.findById(carOrderId);
        /*
         if(isValid)
@@ -149,6 +152,15 @@ public class CarOrderManagerImpl implements CarOrderManager{
         carOrderOptional.ifPresentOrElse(carOrder -> {
             sendCarOrderEvent(carOrder,CarOrderEventEnum.CARORDER_PICKED_UP);
         },()-> log.error("order not found "+id));
+    }
+
+    @Override
+    public void cancelOrder(UUID id) {
+        carOrderRepository.findById(id).ifPresentOrElse(
+                carOrder -> {
+                    sendCarOrderEvent(carOrder,CarOrderEventEnum.CANCEL_ORDER);
+                },()->log.error("Order not found "+id)
+        );
     }
 
     private void sendCarOrderEvent(CarOrder carOrder,CarOrderEventEnum eventEnum){

@@ -29,12 +29,26 @@ public class CarOrderAllocationListener {
         {
             pendingInventory=true;
         }
-
+        boolean sendResponse =true;
         // set allocation error
         if(request.getCarOrderDto().getCustomerRef()!= null && request.getCarOrderDto().getCustomerRef()
                 .equals("partial-allocation"))
         {
             allocationError=true;
+        }
+
+        if(request.getCarOrderDto().getCustomerRef() != null)
+        {
+            if(request.getCarOrderDto().getCustomerRef().equals("fail-allocation"))
+            {
+                allocationError = true;
+            }else if(request.getCarOrderDto().getCustomerRef().equals("partial-allocation"))
+            {
+                pendingInventory = true;
+            }else if(request.getCarOrderDto().getCustomerRef().equals("dont-allocate"))
+            {
+                sendResponse = true;
+            }
         }
         boolean finalPendingInventory= pendingInventory;
         request.getCarOrderDto().getCarOrderLines().forEach(carOrderLineDto -> {
@@ -49,10 +63,15 @@ public class CarOrderAllocationListener {
             }
         });
 
-        jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE, AllocateOrderResult.builder()
-        .carOrderDto(request.getCarOrderDto())
-        .pendingInventory(pendingInventory)
-        .allocationError(allocationError)
-        .build());
+
+
+        if(sendResponse)
+        {
+            jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE, AllocateOrderResult.builder()
+                    .carOrderDto(request.getCarOrderDto())
+                    .pendingInventory(pendingInventory)
+                    .allocationError(allocationError)
+                    .build());
+        }
     }
 }

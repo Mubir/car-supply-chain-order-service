@@ -20,16 +20,31 @@ public class CarOrderValidationListener {
     public void list(Message msg)
     {
         boolean isValid = true;
+        boolean sendResponse = true;
         ValidateOrderRequest request = (ValidateOrderRequest) msg.getPayload();
-        if(request.getCarOrderDto().getCustomerRef() != null && request.getCarOrderDto().getCustomerRef()
+       /* if(request.getCarOrderDto().getCustomerRef() != null && request.getCarOrderDto().getCustomerRef()
         .equals("fail-validation"))
         {
             isValid =false;
         }
-        jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
-                ValidateOrderResult.builder()
-        .isValid(isValid)
-        .orderId(request.getCarOrderDto().getId())
-        .build());
+
+        */
+        if(request.getCarOrderDto().getCustomerRef() != null)
+        {
+            if(request.getCarOrderDto().getCustomerRef().equals("fail-validation"))
+            {
+            isValid = false;
+            }else if(request.getCarOrderDto().getCustomerRef().equals("dont-validate"))
+            {
+            sendResponse = false;
+            }
+        }
+        if(sendResponse) {
+            jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
+                    ValidateOrderResult.builder()
+                            .isValid(isValid)
+                            .orderId(request.getCarOrderDto().getId())
+                            .build());
+        }
     }
 }
