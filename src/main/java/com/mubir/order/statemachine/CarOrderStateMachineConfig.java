@@ -17,6 +17,7 @@ import java.util.EnumSet;
 public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<CarOrderStatusEnum, CarOrderEventEnum> {
     private final Action<CarOrderStatusEnum,CarOrderEventEnum> validateOrderAction;
     private final Action<CarOrderStatusEnum,CarOrderEventEnum> allocateOrderAction;
+    private final Action<CarOrderStatusEnum,CarOrderEventEnum> validationFailureAction;
     @Override
     public void configure(StateMachineStateConfigurer<CarOrderStatusEnum, CarOrderEventEnum>
                                       states) throws Exception {
@@ -42,6 +43,7 @@ public class CarOrderStateMachineConfig extends StateMachineConfigurerAdapter<Ca
                 .and().withExternal()
                 .source(CarOrderStatusEnum.VALIDATION_PENDING).target(CarOrderStatusEnum.VALIDATION_EXCEPTION)
                 .event(CarOrderEventEnum.VALIDATION_FAILED)
+                .action(validationFailureAction)
                 .and().withExternal()
                 .source(CarOrderStatusEnum.VALIDATED).target(CarOrderStatusEnum.ALLOCATION_PENDING)
                 .event(CarOrderEventEnum.ALLOCATE_ORDER)
