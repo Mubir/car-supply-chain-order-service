@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -63,7 +65,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
         carOrderOptional.ifPresentOrElse(carOrder -> {
             if(isValid){
                 sendCarOrderEvent(carOrder, CarOrderEventEnum.VALIDATION_PASSED);
-
+                awaitForStatus(carOrderId,CarOrderStatusEnum.VALIDATED);
                 CarOrder validatedOrder = carOrderRepository.findById(carOrderId).get();
 
                 sendCarOrderEvent(validatedOrder, CarOrderEventEnum.ALLOCATE_ORDER);
@@ -86,6 +88,7 @@ public class CarOrderManagerImpl implements CarOrderManager{
         beerOrderOptional.ifPresentOrElse(carOrder -> {
             sendCarOrderEvent(carOrder, CarOrderEventEnum.ALLOCATION_SUCCESS);
             updateAllocatedQuantity(carOrderDto);
+            awaitForStatus(carOrder.getId(),CarOrderStatusEnum.ALLOCATED);
         }, () -> log.error("Order Id Not Found: " + carOrderDto.getId() ));
     }
     //private void updateAllocatedQuantity(CarOrderDto carOrderDto,CarOrder carOrder)
@@ -126,9 +129,9 @@ public class CarOrderManagerImpl implements CarOrderManager{
         */
         Optional<CarOrder> beerOrderOptional = carOrderRepository.findById(carOrderDto.getId());
 
-        beerOrderOptional.ifPresentOrElse(beerOrder -> {
-            sendCarOrderEvent(beerOrder, CarOrderEventEnum.ALLOCATION_ON_INVENTORY);
-
+        beerOrderOptional.ifPresentOrElse(carOrder -> {
+            sendCarOrderEvent(carOrder, CarOrderEventEnum.ALLOCATION_ON_INVENTORY);
+            awaitForStatus(carOrder.getId(),CarOrderStatusEnum.PENDING_INVENTORY);
             updateAllocatedQuantity(carOrderDto);
         }, () -> log.error("Order Id Not Found: " + carOrderDto.getId() ));
     }
@@ -185,5 +188,38 @@ public class CarOrderManagerImpl implements CarOrderManager{
 
         sm.start();
         return sm;
+    }
+
+    private void awaitForStatus(UUID carOrderId,CarOrderStatusEnum statusEnum)
+    {
+        AtomicBoolean found = new AtomicBoolean(false);
+        AtomicInteger loopCount = new AtomicInteger(0);
+
+        while (!found.get()) {
+            if (loopCount.incrementAndGet() > 10) {
+                found.set(true);
+                log.debug("Loop Retries exceeded");
+            }
+
+            carOrderRepository.findById(carOrderId).ifPresentOrElse(carOrder -> {
+                if (carOrder.getOrderStatus().equals(statusEnum)) {
+                    found.set(true);
+                    log.debug("Order Found");
+                } else {
+                    log.debug("Order Status Not Equal. Expected: " + statusEnum.name() + " Found: " + carOrder.getOrderStatus().name());
+                }
+            }, () -> {
+                log.debug("Order Id Not Found");
+            });
+
+            if (!found.get()) {
+                try {
+                    log.debug("Sleeping for retry");
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
+        }
     }
 }

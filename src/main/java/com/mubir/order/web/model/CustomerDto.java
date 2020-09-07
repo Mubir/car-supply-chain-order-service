@@ -15,8 +15,8 @@ public class CustomerDto extends BaseItem{
     @Builder
     public CustomerDto(UUID id, Integer version, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate, String name) {
         super(id, version, createdDate, lastModifiedDate);
-        Name = name;
+        customerName = name;
     }
 
-    public String Name;
+    public String customerName;
 }
