@@ -45,6 +45,7 @@ public class TestingRoomService {
         }else
         {
             log.error("too many/few customer");
+            customerList.forEach(customer -> log.debug(customer.toString()));
         }
     }
 

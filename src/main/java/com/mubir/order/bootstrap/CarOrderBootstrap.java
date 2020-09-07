@@ -26,7 +26,8 @@ public class CarOrderBootstrap implements CommandLineRunner
     }
 
     private void loadCustomerData() {
-        if (customerRepository.count() ==0) {
+        //if (customerRepository.count() ==0) {
+        if(customerRepository.findAllByCustomerNameLike(CarOrderBootstrap.TASTING_ROOM).size()==0){
             Customer customer= customerRepository.save(Customer.builder()
                     .customerName(TASTING_ROOM)
                     .apiKey(UUID.randomUUID())
